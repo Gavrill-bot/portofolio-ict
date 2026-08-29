@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gavrill | Personal Portfolio & Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-light: #eff6ff;
+      --danger: #ef4444;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 12px 20px -3px rgba(37, 99, 235, 0.08);
+      --transition: all 0.25s ease;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg-main); color: var(--text-main); line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+    .hidden { display: none !important; }
+    .container { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+    /* UI PUBLIC PORTOFOLIO */
+    .navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); }
+    .nav-container { display: flex; justify-content: space-between; align-items: center; height: 64px; }
+    .brand { font-weight: 700; font-size: 1.15rem; display: flex; align-items: center; gap: 8px; }
+    .brand-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
+    .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; }
+    .nav-links a { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); }
+    .nav-links a:hover { color: var(--accent); }
+
+    .hero { padding: 130px 0 60px; }
+    .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: var(--accent-light); border: 1px solid #bfdbfe; border-radius: 100px; font-size: 0.8rem; font-weight: 600; color: var(--accent); margin-bottom: 20px; }
+    .hero-title { font-size: 2.5rem; font-weight: 700; line-height: 1.25; margin-bottom: 16px; }
+    .hero-title span { background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-subtitle { font-size: 1.05rem; color: var(--text-muted); max-width: 620px; margin-bottom: 28px; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; font-size: 0.9rem; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; transition: var(--transition); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: #fff; color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-danger { background: var(--danger); color: #fff; }
+
+    .section { padding: 50px 0; }
+    .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+    .section-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
+
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 28px; }
+    .filter-btn { padding: 6px 16px; font-size: 0.85rem; border-radius: 100px; border: 1px solid var(--border-color); background: #fff; cursor: pointer; }
+    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+    .project-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+    .card-thumb { width: 100%; height: 180px; background: #f1f5f9; position: relative; }
+    .card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .card-body { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+    .card-tags { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+    .tag { font-size: 0.75rem; padding: 2px 8px; background: #f1f5f9; border-radius: 4px; color: var(--text-muted); font-weight: 600; }
+    .tag-upcoming { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .skill-item { background: var(--bg-card); border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 10px; font-weight: 500; }
+
+    .footer { border-top: 1px solid var(--border-color); padding: 40px 0; margin-top: 60px; background: #fff; }
+
+    /* UI DASHBOARD ADMIN */
+    .admin-wrapper { display: flex; min-height: 100vh; background: var(--bg-main); }
+    .admin-sidebar { width: 250px; background: #fff; border-right: 1px solid var(--border-color); padding: 24px 16px; display: flex; flex-direction: column; }
+    .admin-main { flex: 1; padding: 40px; overflow-y: auto; }
+    .admin-nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; border: none; background: none; color: var(--text-muted); font-weight: 500; border-radius: 8px; cursor: pointer; text-align: left; }
+    .admin-nav-btn.active, .admin-nav-btn:hover { background: var(--accent-light); color: var(--accent); }
+    
+    .card-box { background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+    .input-field { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; outline: none; }
+    textarea.input-field { min-height: 80px; resize: vertical; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-card { background: #fff; padding: 32px; border-radius: var(--radius-md); width: 100%; max-width: 380px; box-shadow: var(--shadow-lg); }
+  </style>
+</head>
+<body>
+
+  <div id="public-view">
+    <header class="navbar">
+      <div class="container nav-container">
+        <a href="#" class="brand"><span class="brand-dot"></span> Gavrill</a>
+        <ul class="nav-links">
+          <li><a href="#projects">Project</a></li>
+          <li><a href="#skills">Keahlian</a></li>
+          <li><a href="#contact">Kontak</a></li>
+          <li><button class="btn btn-secondary" style="padding: 6px 14px;" onclick="showLoginModal()"><i data-lucide="lock" size="14"></i> Admin</button></li>
+        </ul>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="status-badge" id="view-hero-status"><i data-lucide="sparkles" size="14"></i> Ready for New Projects</div>
+        <h1 class="hero-title" id="view-hero-title">Halo, Saya <span>Gavrill</span>.<br>Web Developer & UI Designer.</h1>
+        <p class="hero-subtitle" id="view-hero-subtitle">Selamat datang di portofolio karya digital saya.</p>
+        <div>
+          <a href="#projects" class="btn btn-primary">Eksplorasi Project <i data-lucide="arrow-down" size="16"></i></a>
+        </div>
+      </section>
+
+      <section id="projects" class="section">
+        <h2 class="section-title">Koleksi Project</h2>
+        <p class="section-desc">Daftar produk digital dan eksplorasi desain karya Gavrill.</p>
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="filterProjects('all', this)">Semua</button>
+          <button class="filter-btn" onclick="filterProjects('web', this)">Web App</button>
+          <button class="filter-btn" onclick="filterProjects('design', this)">UI/UX Design</button>
+          <button class="filter-btn" onclick="filterProjects('mobile', this)">Mobile App</button>
+        </div>
+        <div class="projects-grid" id="view-projects-grid"></div>
+      </section>
+
+      <section id="skills" class="section">
+        <h2 class="section-title">Keahlian & Tools</h2>
+        <p class="section-desc">Teknologi yang biasa digunakan dalam pengembangan produk.</p>
+        <div class="skills-grid" id="view-skills-grid"></div>
+      </section>
+    </main>
+
+    <footer id="contact" class="footer">
+      <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3 style="font-size:1.1rem; font-weight:600;">Hubungi Gavrill</h3>
+          <p id="view-contact-email" style="color:var(--text-muted)">gavrill@domain.com</p>
+        </div>
+        <div id="view-contact-socials" style="display:flex; gap:12px;"></div>
+      </div>
+    </footer>
+  </div>
+
+  <div id="login-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h2 style="margin-bottom:8px;">Admin Login</h2>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Masuk ke dashboard untuk mengedit isi portofolio.</p>
+      <form id="loginForm">
+        <div class="form-group"><label>Username</label><input type="text" id="loginUsername" class="input-field" required></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPassword" class="input-field" required></div>
+        <div style="display:flex; gap:8px; margin-top:20px;">
+          <button type="submit" class="btn btn-primary" style="flex:1;">Masuk</button>
+          <button type="button" class="btn btn-secondary" onclick="hideLoginModal()">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="admin-view" class="admin-wrapper hidden">
+    <aside class="admin-sidebar">
+      <h3 style="margin-bottom:24px; display:flex; align-items:center; gap:8px;"><i data-lucide="shield" size="20"></i> Dashboard</h3>
+      <div style="display:flex; flex-direction:column; gap:4px; flex:1;">
+        <button class="admin-nav-btn active" onclick="switchTab('hero', this)"><i data-lucide="layout" size="18"></i> Hero Section</button>
+        <button class="admin-nav-btn" onclick="switchTab('projects', this)"><i data-lucide="folder" size="18"></i> Projects</button>
+        <button class="admin-nav-btn" onclick="switchTab('skills', this)"><i data-lucide="cpu" size="18"></i> Skills</button>
+        <button class="admin-nav-btn" onclick="switchTab('contact', this)"><i data-lucide="mail" size="18"></i> Kontak</button>
+        <button class="admin-nav-btn" onclick="switchTab('security', this)"><i data-lucide="key" size="18"></i> Keamanan</button>
+      </div>
+      <button class="btn btn-secondary" onclick="logoutAdmin()"><i data-lucide="log-out" size="16"></i> Keluar</button>
+    </aside>
+
+    <main class="admin-main">
+      <div id="tab-hero" class="tab-content">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+          <h2>Edit Hero Section</h2>
+          <button class="btn btn-primary" onclick="saveData()"><i data-lucide="save" size="16"></i> Simpan Data</button>
+        </div>
+        <div class="card-box">
+          <div class="form-group"><label>Status Badge</label><input type="text" id="editHeroStatus" class="input-field"></div>
+          <div class="form-group"><label>Judul Utama (HTML diizinkan)</label><textarea id="editHeroTitle" class="input-field"></textarea></div>
+          <div class="form-group"><label>Sub-judul</label><textarea id="editHeroSubtitle" class="input-field"></textarea></div>
+        </div>
+      </div>
+
+      <div id="tab-projects" class="tab-content hidden">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+          <h2>Edit Projects</h2>
+          <div>
+            <button class="btn btn-secondary" onclick="addProject()"><i data-lucide="plus" size="16"></i> Tambah Project</button>
+            <button class="btn btn-primary" onclick="saveData()"><i data-lucide="save" size="16"></i> Simpan Data</button>
+          </div>
+        </div>
+        <div id="editProjectsList"></div>
+      </div>
+
+      <div id="tab-skills" class="tab-content hidden">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+          <h2>Edit Skills</h2>
+          <div>
+            <button class="btn btn-secondary" onclick="addSkill()"><i data-lucide="plus" size="16"></i> Tambah Skill</button>
+            <button class="btn btn-primary" onclick="saveData()"><i data-lucide="save" size="16"></i> Simpan Data</button>
+          </div>
+        </div>
+        <div id="editSkillsList"></div>
+      </div>
+
+      <div id="tab-contact" class="tab-content hidden">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+          <h2>Edit Kontak & Sosmed</h2>
+          <button class="btn btn-primary" onclick="saveData()"><i data-lucide="save" size="16"></i> Simpan Data</button>
+        </div>
+        <div class="card-box">
+          <div class="form-group"><label>Email</label><input type="email" id="editContactEmail" class="input-field"></div>
+          <div class="form-group"><label>GitHub URL</label><input type="text" id="editContactGithub" class="input-field"></div>
+          <div class="form-group"><label>LinkedIn URL</label><input type="text" id="editContactLinkedin" class="input-field"></div>
+          <div class="form-group"><label>Twitter URL</label><input type="text" id="editContactTwitter" class="input-field"></div>
+        </div>
+      </div>
+
+      <div id="tab-security" class="tab-content hidden">
+        <h2 style="margin-bottom:20px;">Ubah Kredensial Admin</h2>
+        <div class="card-box" style="max-width:400px;">
+          <div class="form-group"><label>Username Baru</label><input type="text" id="editAdminUser" class="input-field"></div>
+          <div class="form-group"><label>Password Baru</label><input type="password" id="editAdminPass" class="input-field"></div>
+          <button class="btn btn-primary" onclick="updateCredentials()">Update Kredensial</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // DATABASE INSIALISASI
+    const initialStore = {
+      auth: { username: "admin", password: "admin123" },
+      hero: {
+        status: "Ready for New Projects",
+        title: "Halo, Saya <span>Gavrill</span>.<br>Web Developer & UI Designer.",
+        subtitle: "Selamat datang di tempat saya mendokumentasikan karya digital. Berfokus pada sistem web yang intuitif dan berkinerja tinggi."
+      },
+      projects: [
+        { 
+          id: "1", 
+          category: "web", 
+          title: "Analytics SaaS Dashboard", 
+          desc: "Platform pemantauan data real-time dengan antarmuka bersih.", 
+          tags: "React, Tailwind", 
+          image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80", 
+          demoUrl: "#", 
+          codeUrl: "#" 
+        },
+        { 
+          id: "2", 
+          category: "web", 
+          title: "Project Database Firebase (Coming Soon P7)", 
+          desc: "Aplikasi interaktif yang terhubung ke cloud database realtime", 
+          tags: "Upcoming, Firebase, Realtime DB", 
+          image: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=600&q=80", 
+          demoUrl: "#", 
+          codeUrl: "#" 
+        }
+      ],
+      skills: [
+        { id: "1", name: "HTML & CSS", icon: "code" },
+        { id: "2", name: "JavaScript / TS", icon: "file-code" },
+        { id: "3", name: "React / Next.js", icon: "atom" },
+        { id: "4", name: "Firebase / DB", icon: "database" }
+      ],
+      contact: { email: "gavrill@domain.com", github: "#", linkedin: "#", twitter: "#" }
+    };
+
+    function getDB() {
+      const dataStr = localStorage.getItem('gavrill_portfolio_v2');
+      if (!dataStr) {
+        localStorage.setItem('gavrill_portfolio_v2', JSON.stringify(initialStore));
+        return initialStore;
+      }
+      return JSON.parse(dataStr);
+    }
+
+    function setDB(data) {
+      localStorage.setItem('gavrill_portfolio_v2', JSON.stringify(data));
+      renderPublicView();
+    }
+
+    let db = getDB();
+
+    // RENDER PORTOFOLIO PUBLIK
+    function renderPublicView() {
+      db = getDB();
+      document.getElementById('view-hero-status').innerHTML = `<i data-lucide="sparkles" size="14"></i> ${db.hero.status}`;
+      document.getElementById('view-hero-title').innerHTML = db.hero.title;
+      document.getElementById('view-hero-subtitle').textContent = db.hero.subtitle;
+
+      const projectGrid = document.getElementById('view-projects-grid');
+      projectGrid.innerHTML = db.projects.map(p => {
+        const tagList = p.tags.split(',').map(t => {
+          const cleanTag = t.trim();
+          const isUpcoming = cleanTag.toLowerCase() === 'upcoming';
+          return `<span class="tag ${isUpcoming ? 'tag-upcoming' : ''}">${cleanTag}</span>`;
+        }).join('');
+
+        return `
+          <article class="project-card" data-category="${p.category}">
+            <div class="card-thumb">
+              <img src="${p.image}" alt="${p.title}">
+            </div>
+            <div class="card-body">
+              <div class="card-tags">${tagList}</div>
+              <h3 style="font-size:1.1rem; margin-bottom:6px;">${p.title}</h3>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px; flex-grow:1;">${p.desc}</p>
+              <div style="display:flex; justify-content:space-between; border-top:1px solid var(--border-color); padding-top:12px;">
+                <a href="${p.demoUrl}" style="color:var(--accent); font-weight:600; font-size:0.85rem;">Demo <i data-lucide="arrow-up-right" size="14"></i></a>
+                <a href="${p.codeUrl}" style="color:var(--text-muted); font-size:0.85rem;"><i data-lucide="github" size="14"></i> Code</a>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      const skillGrid = document.getElementById('view-skills-grid');
+      skillGrid.innerHTML = db.skills.map(s => `
+        <div class="skill-item"><i data-lucide="${s.icon}" size="18"></i> ${s.name}</div>
+      `).join('');
+
+      document.getElementById('view-contact-email').textContent = db.contact.email;
+      document.getElementById('view-contact-socials').innerHTML = `
+        <a href="${db.contact.github}" target="_blank"><i data-lucide="github" size="18"></i></a>
+        <a href="${db.contact.linkedin}" target="_blank"><i data-lucide="linkedin" size="18"></i></a>
+        <a href="${db.contact.twitter}" target="_blank"><i data-lucide="twitter" size="18"></i></a>
+      `;
+
+      lucide.createIcons();
+    }
+
+    function filterProjects(category, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('#view-projects-grid .project-card').forEach(card => {
+        card.style.display = (category === 'all' || card.dataset.category === category) ? 'flex' : 'none';
+      });
+    }
+
+    // MODAL & AUTENTIKASI
+    function showLoginModal() { document.getElementById('login-modal').classList.remove('hidden'); }
+    function hideLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const u = document.getElementById('loginUsername').value;
+      const p = document.getElementById('loginPassword').value;
+      if (u === db.auth.username && p === db.auth.password) {
+        hideLoginModal();
+        openAdminPanel();
+      } else { alert('Username / Password salah!'); }
+    });
+
+    function openAdminPanel() {
+      document.getElementById('public-view').classList.add('hidden');
+      document.getElementById('admin-view').classList.remove('hidden');
+      populateAdminFields();
+    }
+
+    function logoutAdmin() {
+      document.getElementById('admin-view').classList.add('hidden');
+      document.getElementById('public-view').classList.remove('hidden');
+    }
+
+    // LOGIKA DASHBOARD ADMIN
+    function populateAdminFields() {
+      document.getElementById('editHeroStatus').value = db.hero.status;
+      document.getElementById('editHeroTitle').value = db.hero.title;
+      document.getElementById('editHeroSubtitle').value = db.hero.subtitle;
+
+      document.getElementById('editContactEmail').value = db.contact.email;
+      document.getElementById('editContactGithub').value = db.contact.github;
+      document.getElementById('editContactLinkedin').value = db.contact.linkedin;
+      document.getElementById('editContactTwitter').value = db.contact.twitter;
+
+      document.getElementById('editAdminUser').value = db.auth.username;
+      document.getElementById('editAdminPass').value = db.auth.password;
+
+      renderAdminProjects();
+      renderAdminSkills();
+    }
+
+    function renderAdminProjects() {
+      document.getElementById('editProjectsList').innerHTML = db.projects.map((p, i) => `
+        <div class="card-box">
+          <div class="form-group"><label>Judul</label><input type="text" value="${p.title}" class="input-field" onchange="db.projects[${i}].title=this.value"></div>
+          <div class="form-group"><label>Kategori (web/design/mobile)</label><input type="text" value="${p.category}" class="input-field" onchange="db.projects[${i}].category=this.value"></div>
+          <div class="form-group"><label>Deskripsi</label><textarea class="input-field" onchange="db.projects[${i}].desc=this.value">${p.desc}</textarea></div>
+          <div class="form-group"><label>Tags (Gunakan 'Upcoming' untuk badge khusus)</label><input type="text" value="${p.tags}" class="input-field" onchange="db.projects[${i}].tags=this.value"></div>
+          <div class="form-group"><label>URL Gambar</label><input type="text" value="${p.image}" class="input-field" onchange="db.projects[${i}].image=this.value"></div>
+          <button class="btn btn-danger" onclick="db.projects.splice(${i},1); renderAdminProjects();">Hapus Project</button>
+        </div>
+      `).join('');
+    }
+
+    function renderAdminSkills() {
+      document.getElementById('editSkillsList').innerHTML = db.skills.map((s, i) => `
+        <div class="card-box" style="display:flex; gap:12px; align-items:center;">
+          <input type="text" value="${s.name}" class="input-field" placeholder="Nama Skill" onchange="db.skills[${i}].name=this.value">
+          <input type="text" value="${s.icon}" class="input-field" placeholder="Nama Ikon Lucide" onchange="db.skills[${i}].icon=this.value">
+          <button class="btn btn-danger" onclick="db.skills.splice(${i},1); renderAdminSkills();">Hapus</button>
+        </div>
+      `).join('');
+    }
+
+    function addProject() {
+      db.projects.unshift({ id: Date.now().toString(), category: "web", title: "Project Baru", desc: "", tags: "Upcoming", image: "", demoUrl: "#", codeUrl: "#" });
+      renderAdminProjects();
+    }
+
+    function addSkill() {
+      db.skills.push({ id: Date.now().toString(), name: "Skill Baru", icon: "code" });
+      renderAdminSkills();
+    }
+
+    function saveData() {
+      db.hero.status = document.getElementById('editHeroStatus').value;
+      db.hero.title = document.getElementById('editHeroTitle').value;
+      db.hero.subtitle = document.getElementById('editHeroSubtitle').value;
+
+      db.contact.email = document.getElementById('editContactEmail').value;
+      db.contact.github = document.getElementById('editContactGithub').value;
+      db.contact.linkedin = document.getElementById('editContactLinkedin').value;
+      db.contact.twitter = document.getElementById('editContactTwitter').value;
+
+      setDB(db);
+      alert('Perubahan berhasil disimpan!');
+    }
+
+    function updateCredentials() {
+      db.auth.username = document.getElementById('editAdminUser').value;
+      db.auth.password = document.getElementById('editAdminPass').value;
+      setDB(db);
+      alert('Kredensial Admin berhasil diperbarui!');
+    }
+
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+      document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      btn.classList.add('active');
+    }
+
+    // INIT
+    document.addEventListener('DOMContentLoaded', renderPublicView);
+  </script>
+</body>
+</html>
