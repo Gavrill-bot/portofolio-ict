@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -42,7 +43,19 @@
     .nav-links a { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); }
     .nav-links a:hover { color: var(--accent); }
 
+    /* HERO LAYOUT 2-KOLOM (DENGAN GAMBAR) */
     .hero { padding: 130px 0 60px; }
+    .hero-content { display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+    .hero-text { flex: 1; }
+    .hero-image { flex: 1; max-width: 450px; text-align: center; }
+    .hero-image img { width: 100%; height: auto; max-height: 400px; object-fit: cover; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); }
+    
+    @media (max-width: 768px) {
+      .hero-content { flex-direction: column-reverse; text-align: center; }
+      .hero-subtitle { margin-left: auto; margin-right: auto; }
+      .hero-image { max-width: 100%; }
+    }
+
     .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: var(--accent-light); border: 1px solid #bfdbfe; border-radius: 100px; font-size: 0.8rem; font-weight: 600; color: var(--accent); margin-bottom: 20px; }
     .hero-title { font-size: 2.5rem; font-weight: 700; line-height: 1.25; margin-bottom: 16px; }
     .hero-title span { background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -109,12 +122,20 @@
     </header>
 
     <main class="container">
+      <!-- HERO SECTION BERDAMPINGAN DENGAN GAMBAR -->
       <section class="hero">
-        <div class="status-badge" id="view-hero-status"><i data-lucide="sparkles" size="14"></i> Ready for New Projects</div>
-        <h1 class="hero-title" id="view-hero-title">Halo, Saya <span>Gavrill</span>.<br>Web Developer & UI Designer.</h1>
-        <p class="hero-subtitle" id="view-hero-subtitle">Selamat datang di portofolio karya digital saya.</p>
-        <div>
-          <a href="#projects" class="btn btn-primary">Eksplorasi Project <i data-lucide="arrow-down" size="16"></i></a>
+        <div class="hero-content">
+          <div class="hero-text">
+            <div class="status-badge" id="view-hero-status"><i data-lucide="sparkles" size="14"></i> Ready for New Projects</div>
+            <h1 class="hero-title" id="view-hero-title">Halo, Saya <span>Gavrill</span>.<br>Web Developer & UI Designer.</h1>
+            <p class="hero-subtitle" id="view-hero-subtitle">Selamat datang di portofolio karya digital saya.</p>
+            <div>
+              <a href="#projects" class="btn btn-primary">Eksplorasi Project <i data-lucide="arrow-down" size="16"></i></a>
+            </div>
+          </div>
+          <div class="hero-image">
+            <img id="view-hero-image" src="" alt="Gavrill Profile / Hero Image">
+          </div>
         </div>
       </section>
 
@@ -186,6 +207,8 @@
           <div class="form-group"><label>Status Badge</label><input type="text" id="editHeroStatus" class="input-field"></div>
           <div class="form-group"><label>Judul Utama (HTML diizinkan)</label><textarea id="editHeroTitle" class="input-field"></textarea></div>
           <div class="form-group"><label>Sub-judul</label><textarea id="editHeroSubtitle" class="input-field"></textarea></div>
+          <!-- FIELD INPUT URL GAMBAR HERO -->
+          <div class="form-group"><label>URL Gambar Hero</label><input type="text" id="editHeroImage" class="input-field" placeholder="https://domain.com/foto.jpg"></div>
         </div>
       </div>
 
@@ -236,13 +259,14 @@
   </div>
 
   <script>
-    // DATABASE INSIALISASI
+    // DATABASE INSIALISASI (DENGAN FIELD HERO IMAGE)
     const initialStore = {
       auth: { username: "admin", password: "admin123" },
       hero: {
         status: "Ready for New Projects",
         title: "Halo, Saya <span>Gavrill</span>.<br>Web Developer & UI Designer.",
-        subtitle: "Selamat datang di tempat saya mendokumentasikan karya digital. Berfokus pada sistem web yang intuitif dan berkinerja tinggi."
+        subtitle: "Selamat datang di tempat saya mendokumentasikan karya digital. Berfokus pada sistem web yang intuitif dan berkinerja tinggi.",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"
       },
       projects: [
         { 
@@ -297,6 +321,7 @@
       document.getElementById('view-hero-status').innerHTML = `<i data-lucide="sparkles" size="14"></i> ${db.hero.status}`;
       document.getElementById('view-hero-title').innerHTML = db.hero.title;
       document.getElementById('view-hero-subtitle').textContent = db.hero.subtitle;
+      document.getElementById('view-hero-image').src = db.hero.image || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
 
       const projectGrid = document.getElementById('view-projects-grid');
       projectGrid.innerHTML = db.projects.map(p => {
@@ -377,6 +402,7 @@
       document.getElementById('editHeroStatus').value = db.hero.status;
       document.getElementById('editHeroTitle').value = db.hero.title;
       document.getElementById('editHeroSubtitle').value = db.hero.subtitle;
+      document.getElementById('editHeroImage').value = db.hero.image || "";
 
       document.getElementById('editContactEmail').value = db.contact.email;
       document.getElementById('editContactGithub').value = db.contact.github;
@@ -427,6 +453,7 @@
       db.hero.status = document.getElementById('editHeroStatus').value;
       db.hero.title = document.getElementById('editHeroTitle').value;
       db.hero.subtitle = document.getElementById('editHeroSubtitle').value;
+      db.hero.image = document.getElementById('editHeroImage').value;
 
       db.contact.email = document.getElementById('editContactEmail').value;
       db.contact.github = document.getElementById('editContactGithub').value;
