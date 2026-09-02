@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -12,7 +11,7 @@
   <style>
     :root {
       --bg-main: #f8fafc;
-      --bg-card: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.85);
       --border-color: #e2e8f0;
       --text-main: #0f172a;
       --text-muted: #64748b;
@@ -24,36 +23,90 @@
       --radius-md: 12px;
       --radius-lg: 16px;
       --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 12px 20px -3px rgba(37, 99, 235, 0.08);
+      --shadow-lg: 0 12px 20px -3px rgba(37, 99, 235, 0.12);
       --transition: all 0.25s ease;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     html { scroll-behavior: smooth; }
-    body { background: var(--bg-main); color: var(--text-main); line-height: 1.6; }
+    body { background: var(--bg-main); color: var(--text-main); line-height: 1.6; overflow-x: hidden; position: relative; }
     a { color: inherit; text-decoration: none; }
     .hidden { display: none !important; }
-    .container { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+    .container { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+
+    /* BACKGROUND ANIMATION LAYERS */
+    .bg-animation {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.4;
+      animation: blobFloat 14s ease-in-out infinite alternate;
+    }
+    .blob-1 { width: 400px; height: 400px; background: #3b82f6; top: -80px; left: -80px; }
+    .blob-2 { width: 450px; height: 450px; background: #0284c7; bottom: -100px; right: -100px; animation-delay: -5s; animation-duration: 18s; }
+    .blob-3 { width: 350px; height: 350px; background: #818cf8; top: 35%; left: 40%; animation-delay: -9s; animation-duration: 16s; }
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(37, 99, 235, 0.12) 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: 0.6;
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes blobFloat {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(80px, 100px) scale(1.15) rotate(90deg); }
+      100% { transform: translate(-60px, 50px) scale(0.95) rotate(180deg); }
+    }
+    @keyframes gridMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 28px 28px; }
+    }
 
     /* UI PUBLIC PORTOFOLIO */
-    .navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); }
+    .navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); }
     .nav-container { display: flex; justify-content: space-between; align-items: center; height: 64px; }
     .brand { font-weight: 700; font-size: 1.15rem; display: flex; align-items: center; gap: 8px; }
-    .brand-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
+    .brand-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981; animation: pulseGlow 2s infinite alternate; }
     .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; }
-    .nav-links a { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); }
+    .nav-links a { font-size: 0.9rem; font-weight: 500; color: var(--text-muted); transition: var(--transition); }
     .nav-links a:hover { color: var(--accent); }
 
-    /* HERO LAYOUT 2-KOLOM (DENGAN GAMBAR) */
+    /* HERO */
     .hero { padding: 130px 0 60px; }
     .hero-content { display: flex; align-items: center; justify-content: space-between; gap: 40px; }
     .hero-text { flex: 1; }
-    .hero-image { flex: 1; max-width: 450px; text-align: center; }
-    .hero-image img { width: 100%; height: auto; max-height: 400px; object-fit: cover; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); }
+    .hero-image { flex: 1; max-width: 400px; text-align: center; }
+    .hero-image img {
+      width: 100%; max-width: 320px; height: auto; object-fit: contain;
+      filter: drop-shadow(0 15px 25px rgba(37, 99, 235, 0.15));
+      animation: floatHero 4s ease-in-out infinite;
+    }
     
+    @keyframes floatHero {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-16px) rotate(1.5deg); }
+    }
+    @keyframes pulseGlow {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #10b981; }
+    }
+
     @media (max-width: 768px) {
       .hero-content { flex-direction: column-reverse; text-align: center; }
       .hero-subtitle { margin-left: auto; margin-right: auto; }
       .hero-image { max-width: 100%; }
+      .project-controls { flex-direction: column; align-items: stretch !important; }
+      .search-box { max-width: 100% !important; }
+      .admin-grid-2 { grid-template-columns: 1fr !important; }
     }
 
     .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: var(--accent-light); border: 1px solid #bfdbfe; border-radius: 100px; font-size: 0.8rem; font-weight: 600; color: var(--accent); margin-bottom: 20px; }
@@ -62,51 +115,110 @@
     .hero-subtitle { font-size: 1.05rem; color: var(--text-muted); max-width: 620px; margin-bottom: 28px; }
 
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; font-size: 0.9rem; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; transition: var(--transition); }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: var(--accent-hover); }
-    .btn-secondary { background: #fff; color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25); }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.9); color: var(--text-main); border: 1px solid var(--border-color); backdrop-filter: blur(4px); }
+    .btn-secondary:hover { background: #fff; transform: translateY(-1px); }
     .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
 
     .section { padding: 50px 0; }
     .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
     .section-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
 
-    .filter-bar { display: flex; gap: 8px; margin-bottom: 28px; }
-    .filter-btn { padding: 6px 16px; font-size: 0.85rem; border-radius: 100px; border: 1px solid var(--border-color); background: #fff; cursor: pointer; }
-    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    /* CONTROLS PROJECT */
+    .project-controls { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+    .search-box { position: relative; flex: 1; max-width: 320px; min-width: 240px; }
+    .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px 10px 42px;
+      border: 1px solid var(--border-color);
+      border-radius: 100px;
+      font-size: 0.88rem;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      outline: none;
+      transition: var(--transition);
+    }
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      background: #fff;
+    }
 
-    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
-    .project-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
-    .card-thumb { width: 100%; height: 180px; background: #f1f5f9; position: relative; }
-    .card-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .card-body { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-btn { padding: 8px 18px; font-size: 0.85rem; font-weight: 500; border-radius: 100px; border: 1px solid var(--border-color); background: rgba(255, 255, 255, 0.9); cursor: pointer; transition: var(--transition); }
+    .filter-btn.active, .filter-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* CARD PROJECT PUBLIC */
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+    .project-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    }
+    .project-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(37, 99, 235, 0.3);
+      box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.1);
+    }
+    .card-thumb { width: 100%; height: 190px; background: #f1f5f9; position: relative; overflow: hidden; }
+    .card-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .project-card:hover .card-thumb img { transform: scale(1.06); }
+    
+    .card-body { padding: 22px; display: flex; flex-direction: column; flex-grow: 1; }
     .card-tags { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-    .tag { font-size: 0.75rem; padding: 2px 8px; background: #f1f5f9; border-radius: 4px; color: var(--text-muted); font-weight: 600; }
-    .tag-upcoming { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .tag { font-size: 0.75rem; padding: 3px 10px; background: #f1f5f9; border-radius: 100px; color: var(--text-muted); font-weight: 600; border: 1px solid rgba(226, 232, 240, 0.6); }
+    .tag-upcoming { background: #fef3c7; color: #b45309; border-color: #fde68a; }
 
     .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-    .skill-item { background: var(--bg-card); border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 10px; font-weight: 500; }
+    .skill-item { background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 10px; font-weight: 500; transition: var(--transition); }
+    .skill-item:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .skill-item img { width: 22px; height: 22px; object-fit: contain; }
 
-    .footer { border-top: 1px solid var(--border-color); padding: 40px 0; margin-top: 60px; background: #fff; }
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 0.95rem; grid-column: 1 / -1; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-color); }
+
+    .footer { border-top: 1px solid var(--border-color); padding: 50px 0; margin-top: 60px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); position: relative; z-index: 1; }
 
     /* UI DASHBOARD ADMIN */
-    .admin-wrapper { display: flex; min-height: 100vh; background: var(--bg-main); }
-    .admin-sidebar { width: 250px; background: #fff; border-right: 1px solid var(--border-color); padding: 24px 16px; display: flex; flex-direction: column; }
+    .admin-wrapper { display: flex; min-height: 100vh; background: var(--bg-main); position: relative; z-index: 10; }
+    .admin-sidebar { width: 260px; background: #fff; border-right: 1px solid var(--border-color); padding: 24px 16px; display: flex; flex-direction: column; }
     .admin-main { flex: 1; padding: 40px; overflow-y: auto; }
-    .admin-nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; border: none; background: none; color: var(--text-muted); font-weight: 500; border-radius: 8px; cursor: pointer; text-align: left; }
+    .admin-nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; border: none; background: none; color: var(--text-muted); font-weight: 500; border-radius: 8px; cursor: pointer; text-align: left; transition: var(--transition); }
     .admin-nav-btn.active, .admin-nav-btn:hover { background: var(--accent-light); color: var(--accent); }
     
-    .card-box { background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; margin-bottom: 20px; }
+    .card-box { background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+    .admin-card-project { border-left: 4px solid var(--accent); transition: var(--transition); }
+    .admin-card-feedback { border-left: 4px solid #10b981; transition: var(--transition); }
+
+    .admin-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
-    .input-field { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; outline: none; }
-    textarea.input-field { min-height: 80px; resize: vertical; }
+    .input-field { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.9rem; outline: none; transition: var(--transition); background: #fff; }
+    .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+    textarea.input-field { min-height: 90px; resize: vertical; }
 
     .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .modal-card { background: #fff; padding: 32px; border-radius: var(--radius-md); width: 100%; max-width: 380px; box-shadow: var(--shadow-lg); }
   </style>
 </head>
 <body>
+
+  <!-- BACKGROUND ANIMATION LAYER -->
+  <div class="bg-animation">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="bg-grid"></div>
+  </div>
 
   <div id="public-view">
     <header class="navbar">
@@ -115,14 +227,13 @@
         <ul class="nav-links">
           <li><a href="#projects">Project</a></li>
           <li><a href="#skills">Keahlian</a></li>
-          <li><a href="#contact">Kontak</a></li>
+          <li><a href="#contact">Kontak & Feedback</a></li>
           <li><button class="btn btn-secondary" style="padding: 6px 14px;" onclick="showLoginModal()"><i data-lucide="lock" size="14"></i> Admin</button></li>
         </ul>
       </div>
     </header>
 
     <main class="container">
-      <!-- HERO SECTION BERDAMPINGAN DENGAN GAMBAR -->
       <section class="hero">
         <div class="hero-content">
           <div class="hero-text">
@@ -134,7 +245,7 @@
             </div>
           </div>
           <div class="hero-image">
-            <img id="view-hero-image" src="" alt="Gavrill Profile / Hero Image">
+            <img id="view-hero-image" src="download.jpg" alt="Gavrill Avatar">
           </div>
         </div>
       </section>
@@ -142,13 +253,26 @@
       <section id="projects" class="section">
         <h2 class="section-title">Koleksi Project</h2>
         <p class="section-desc">Daftar produk digital dan eksplorasi desain karya Gavrill.</p>
-        <div class="filter-bar">
-          <button class="filter-btn active" onclick="filterProjects('all', this)">Semua</button>
-          <button class="filter-btn" onclick="filterProjects('web', this)">Web App</button>
-          <button class="filter-btn" onclick="filterProjects('design', this)">UI/UX Design</button>
-          <button class="filter-btn" onclick="filterProjects('mobile', this)">Mobile App</button>
+        
+        <div class="project-controls">
+          <div class="search-box">
+            <i data-lucide="search" size="18"></i>
+            <input type="text" id="projectSearchInput" placeholder="Cari berdasarkan judul, tag, atau deskripsi..." oninput="handleSearchAndFilter()">
+          </div>
+
+          <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterProjects('all', this)">Semua</button>
+            <button class="filter-btn" onclick="filterProjects('web', this)">Web App</button>
+            <button class="filter-btn" onclick="filterProjects('design', this)">UI/UX Design</button>
+            <button class="filter-btn" onclick="filterProjects('mobile', this)">Mobile App</button>
+          </div>
         </div>
+
         <div class="projects-grid" id="view-projects-grid"></div>
+        <div id="no-projects" class="empty-state hidden">
+          <i data-lucide="search-x" size="32" style="margin-bottom:8px; opacity:0.6;"></i>
+          <p>Project tidak ditemukan. Coba gunakan kata kunci atau filter lain.</p>
+        </div>
       </section>
 
       <section id="skills" class="section">
@@ -156,19 +280,66 @@
         <p class="section-desc">Teknologi yang biasa digunakan dalam pengembangan produk.</p>
         <div class="skills-grid" id="view-skills-grid"></div>
       </section>
+
+      <!-- FORM FEEDBACK & KONTAK PUBLIK -->
+      <section id="contact" class="section">
+        <h2 class="section-title">Hubungi & Kirim Feedback</h2>
+        <p class="section-desc">Punya saran, masukan, atau tawaran project? Kirimkan pesanmu di bawah ini.</p>
+        
+        <div class="admin-grid-2" style="align-items: flex-start;">
+          <div class="card-box" style="background: var(--bg-card); backdrop-filter: blur(12px);">
+            <h3 style="font-size:1.1rem; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+              <i data-lucide="message-square-plus" size="20" style="color:var(--accent);"></i> Form Feedback
+            </h3>
+            <form id="publicFeedbackForm" onsubmit="submitFeedback(event)">
+              <div class="admin-grid-2">
+                <div class="form-group">
+                  <label>Nama Lengkap</label>
+                  <input type="text" id="fbName" class="input-field" placeholder="Nama Anda" required>
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="fbEmail" class="input-field" placeholder="email@domain.com" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Subjek</label>
+                <input type="text" id="fbSubject" class="input-field" placeholder="Tawaran Project / Saran Portofolio" required>
+              </div>
+              <div class="form-group">
+                <label>Pesan / Feedback</label>
+                <textarea id="fbMessage" class="input-field" placeholder="Tuliskan pesan atau feedback Anda..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%;">
+                <i data-lucide="send" size="16"></i> Kirim Pesan Ke Admin
+              </button>
+            </form>
+          </div>
+
+          <div>
+            <div class="card-box" style="background: var(--bg-card); backdrop-filter: blur(12px);">
+              <h3 style="font-size:1.1rem; margin-bottom:12px;">Kontak Direct</h3>
+              <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:16px;">Atau kamu bisa menghubungi langsung via email/sosial media berikut:</p>
+              <p id="view-contact-email" style="font-weight:600; font-size:1rem; margin-bottom:16px; color:var(--accent);"></p>
+              
+              <div id="view-cv-container" style="margin-bottom:20px;"></div>
+              
+              <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:8px;">Sosial Media:</label>
+              <div id="view-contact-socials" style="display:flex; gap:12px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <footer id="contact" class="footer">
-      <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <h3 style="font-size:1.1rem; font-weight:600;">Hubungi Gavrill</h3>
-          <p id="view-contact-email" style="color:var(--text-muted)">gavrill@domain.com</p>
-        </div>
-        <div id="view-contact-socials" style="display:flex; gap:12px;"></div>
+    <footer class="footer">
+      <div class="container" style="text-align:center; color:var(--text-muted); font-size:0.88rem;">
+        &copy; 2026 Gavrill. All rights reserved.
       </div>
     </footer>
   </div>
 
+  <!-- MODAL LOGIN ADMIN -->
   <div id="login-modal" class="modal-overlay hidden">
     <div class="modal-card">
       <h2 style="margin-bottom:8px;">Admin Login</h2>
@@ -184,6 +355,7 @@
     </div>
   </div>
 
+  <!-- DASHBOARD ADMIN WRAPPER -->
   <div id="admin-view" class="admin-wrapper hidden">
     <aside class="admin-sidebar">
       <h3 style="margin-bottom:24px; display:flex; align-items:center; gap:8px;"><i data-lucide="shield" size="20"></i> Dashboard</h3>
@@ -191,7 +363,14 @@
         <button class="admin-nav-btn active" onclick="switchTab('hero', this)"><i data-lucide="layout" size="18"></i> Hero Section</button>
         <button class="admin-nav-btn" onclick="switchTab('projects', this)"><i data-lucide="folder" size="18"></i> Projects</button>
         <button class="admin-nav-btn" onclick="switchTab('skills', this)"><i data-lucide="cpu" size="18"></i> Skills</button>
-        <button class="admin-nav-btn" onclick="switchTab('contact', this)"><i data-lucide="mail" size="18"></i> Kontak</button>
+        
+        <!-- TAB SIDEBAR FEEDBACK MASUK -->
+        <button class="admin-nav-btn" onclick="switchTab('feedbacks', this)">
+          <i data-lucide="inbox" size="18"></i> Feedback 
+          <span id="admin-fb-count" style="background:var(--accent); color:#fff; font-size:0.75rem; padding:2px 8px; border-radius:100px; margin-left:auto;">0</span>
+        </button>
+
+        <button class="admin-nav-btn" onclick="switchTab('contact', this)"><i data-lucide="mail" size="18"></i> Kontak & CV</button>
         <button class="admin-nav-btn" onclick="switchTab('security', this)"><i data-lucide="key" size="18"></i> Keamanan</button>
       </div>
       <button class="btn btn-secondary" onclick="logoutAdmin()"><i data-lucide="log-out" size="16"></i> Keluar</button>
@@ -207,19 +386,31 @@
           <div class="form-group"><label>Status Badge</label><input type="text" id="editHeroStatus" class="input-field"></div>
           <div class="form-group"><label>Judul Utama (HTML diizinkan)</label><textarea id="editHeroTitle" class="input-field"></textarea></div>
           <div class="form-group"><label>Sub-judul</label><textarea id="editHeroSubtitle" class="input-field"></textarea></div>
-          <!-- FIELD INPUT URL GAMBAR HERO -->
-          <div class="form-group"><label>URL Gambar Hero</label><input type="text" id="editHeroImage" class="input-field" placeholder="https://domain.com/foto.jpg"></div>
+          <div class="form-group">
+            <label>Pilih Gambar Hero dari Folder (Komputer/HP)</label>
+            <input type="file" accept="image/*" class="input-field" onchange="handleHeroImageUpload(event)">
+          </div>
+          <div class="form-group">
+            <label>Atau masukan URL Gambar</label>
+            <input type="text" id="editHeroImage" class="input-field" placeholder="download.jpg atau URL online">
+          </div>
         </div>
       </div>
 
       <div id="tab-projects" class="tab-content hidden">
-        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
           <h2>Edit Projects</h2>
-          <div>
+          <div style="display:flex; gap:10px;">
             <button class="btn btn-secondary" onclick="addProject()"><i data-lucide="plus" size="16"></i> Tambah Project</button>
             <button class="btn btn-primary" onclick="saveData()"><i data-lucide="save" size="16"></i> Simpan Data</button>
           </div>
         </div>
+
+        <div class="search-box" style="max-width:100%; margin-bottom:20px;">
+          <i data-lucide="search" size="18"></i>
+          <input type="text" id="adminProjectSearchInput" placeholder="Cari project yang ingin diedit di admin..." oninput="renderAdminProjects()">
+        </div>
+
         <div id="editProjectsList"></div>
       </div>
 
@@ -234,9 +425,18 @@
         <div id="editSkillsList"></div>
       </div>
 
+      <!-- CONTENT TAB FEEDBACK DI ADMIN -->
+      <div id="tab-feedbacks" class="tab-content hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2>Pesan & Feedback Masuk</h2>
+          <button class="btn btn-danger" onclick="clearAllFeedbacks()"><i data-lucide="trash-2" size="16"></i> Hapus Semua Pesan</button>
+        </div>
+        <div id="adminFeedbacksList"></div>
+      </div>
+
       <div id="tab-contact" class="tab-content hidden">
         <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-          <h2>Edit Kontak & Sosmed</h2>
+          <h2>Edit Kontak & Upload CV</h2>
           <button class="btn btn-primary" onclick="saveData()"><i data-lucide="save" size="16"></i> Simpan Data</button>
         </div>
         <div class="card-box">
@@ -244,29 +444,45 @@
           <div class="form-group"><label>GitHub URL</label><input type="text" id="editContactGithub" class="input-field"></div>
           <div class="form-group"><label>LinkedIn URL</label><input type="text" id="editContactLinkedin" class="input-field"></div>
           <div class="form-group"><label>Twitter URL</label><input type="text" id="editContactTwitter" class="input-field"></div>
+          
+          <div class="form-group" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 20px;">
+            <label>Upload File CV / Resume (PDF / Gambar) dari Folder</label>
+            <input type="file" class="input-field" onchange="handleContactCVUpload(event)">
+            <p id="cvFileStatus" style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;"></p>
+          </div>
         </div>
       </div>
 
       <div id="tab-security" class="tab-content hidden">
-        <h2 style="margin-bottom:20px;">Ubah Kredensial Admin</h2>
-        <div class="card-box" style="max-width:400px;">
+        <h2 style="margin-bottom:20px;">Keamanan & Cadangan Data</h2>
+        <div class="card-box" style="max-width:480px;">
+          <h3 style="font-size:1rem; margin-bottom:12px;">Ubah Kredensial Admin</h3>
           <div class="form-group"><label>Username Baru</label><input type="text" id="editAdminUser" class="input-field"></div>
           <div class="form-group"><label>Password Baru</label><input type="password" id="editAdminPass" class="input-field"></div>
-          <button class="btn btn-primary" onclick="updateCredentials()">Update Kredensial</button>
+          <button class="btn btn-primary" style="margin-bottom:24px;" onclick="updateCredentials()">Update Kredensial</button>
+
+          <h3 style="font-size:1rem; margin-bottom:12px; border-top:1px solid var(--border-color); padding-top:16px;">Backup & Restore Data</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Simpan cadangan seluruh data portofolio ke folder atau pulihkan file backup dari folder.</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-secondary" onclick="exportBackup()"><i data-lucide="download" size="16"></i> Simpan Backup ke Folder</button>
+            <label class="btn btn-secondary" style="cursor:pointer;">
+              <i data-lucide="upload" size="16"></i> Restore dari Folder
+              <input type="file" accept=".json" class="hidden" onchange="handleRestoreData(event)">
+            </label>
+          </div>
         </div>
       </div>
     </main>
   </div>
 
   <script>
-    // DATABASE INSIALISASI (DENGAN FIELD HERO IMAGE)
     const initialStore = {
       auth: { username: "admin", password: "admin123" },
       hero: {
         status: "Ready for New Projects",
         title: "Halo, Saya <span>Gavrill</span>.<br>Web Developer & UI Designer.",
         subtitle: "Selamat datang di tempat saya mendokumentasikan karya digital. Berfokus pada sistem web yang intuitif dan berkinerja tinggi.",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"
+        image: "download.jpg"
       },
       projects: [
         { 
@@ -278,50 +494,49 @@
           image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80", 
           demoUrl: "#", 
           codeUrl: "#" 
-        },
-        { 
-          id: "2", 
-          category: "web", 
-          title: "Project Database Firebase (Coming Soon P7)", 
-          desc: "Aplikasi interaktif yang terhubung ke cloud database realtime", 
-          tags: "Upcoming, Firebase, Realtime DB", 
-          image: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=600&q=80", 
-          demoUrl: "#", 
-          codeUrl: "#" 
         }
       ],
       skills: [
-        { id: "1", name: "HTML & CSS", icon: "code" },
-        { id: "2", name: "JavaScript / TS", icon: "file-code" },
-        { id: "3", name: "React / Next.js", icon: "atom" },
-        { id: "4", name: "Firebase / DB", icon: "database" }
+        { id: "1", name: "HTML & CSS", icon: "code", customIcon: "" },
+        { id: "2", name: "JavaScript / TS", icon: "file-code", customIcon: "" }
       ],
-      contact: { email: "gavrill@domain.com", github: "#", linkedin: "#", twitter: "#" }
+      contact: { 
+        email: "gavrill@domain.com", 
+        github: "#", 
+        linkedin: "#", 
+        twitter: "#",
+        cvFile: "",
+        cvName: ""
+      },
+      feedbacks: []
     };
 
+    let currentCategory = 'all';
+
     function getDB() {
-      const dataStr = localStorage.getItem('gavrill_portfolio_v2');
+      const dataStr = localStorage.getItem('gavrill_portfolio_v3');
       if (!dataStr) {
-        localStorage.setItem('gavrill_portfolio_v2', JSON.stringify(initialStore));
+        localStorage.setItem('gavrill_portfolio_v3', JSON.stringify(initialStore));
         return initialStore;
       }
-      return JSON.parse(dataStr);
+      const parsed = JSON.parse(dataStr);
+      if (!parsed.feedbacks) parsed.feedbacks = [];
+      return parsed;
     }
 
     function setDB(data) {
-      localStorage.setItem('gavrill_portfolio_v2', JSON.stringify(data));
+      localStorage.setItem('gavrill_portfolio_v3', JSON.stringify(data));
       renderPublicView();
     }
 
     let db = getDB();
 
-    // RENDER PORTOFOLIO PUBLIK
     function renderPublicView() {
       db = getDB();
       document.getElementById('view-hero-status').innerHTML = `<i data-lucide="sparkles" size="14"></i> ${db.hero.status}`;
       document.getElementById('view-hero-title').innerHTML = db.hero.title;
       document.getElementById('view-hero-subtitle').textContent = db.hero.subtitle;
-      document.getElementById('view-hero-image').src = db.hero.image || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
+      document.getElementById('view-hero-image').src = db.hero.image || "download.jpg";
 
       const projectGrid = document.getElementById('view-projects-grid');
       projectGrid.innerHTML = db.projects.map(p => {
@@ -332,17 +547,17 @@
         }).join('');
 
         return `
-          <article class="project-card" data-category="${p.category}">
+          <article class="project-card" data-category="${p.category}" data-title="${p.title}" data-desc="${p.desc}" data-tags="${p.tags}">
             <div class="card-thumb">
-              <img src="${p.image}" alt="${p.title}">
+              <img src="${p.image || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80'}" alt="${p.title}">
             </div>
             <div class="card-body">
               <div class="card-tags">${tagList}</div>
-              <h3 style="font-size:1.1rem; margin-bottom:6px;">${p.title}</h3>
-              <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:16px; flex-grow:1;">${p.desc}</p>
-              <div style="display:flex; justify-content:space-between; border-top:1px solid var(--border-color); padding-top:12px;">
-                <a href="${p.demoUrl}" style="color:var(--accent); font-weight:600; font-size:0.85rem;">Demo <i data-lucide="arrow-up-right" size="14"></i></a>
-                <a href="${p.codeUrl}" style="color:var(--text-muted); font-size:0.85rem;"><i data-lucide="github" size="14"></i> Code</a>
+              <h3 style="font-size:1.1rem; margin-bottom:8px; font-weight:600;">${p.title}</h3>
+              <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:20px; flex-grow:1; line-height:1.5;">${p.desc}</p>
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(226, 232, 240, 0.8); padding-top:14px;">
+                <a href="${p.demoUrl}" style="color:var(--accent); font-weight:600; font-size:0.85rem; display:inline-flex; align-items:center; gap:4px;">Demo <i data-lucide="arrow-up-right" size="14"></i></a>
+                <a href="${p.codeUrl}" style="color:var(--text-muted); font-size:0.85rem; display:inline-flex; align-items:center; gap:4px;"><i data-lucide="github" size="14"></i> Code</a>
               </div>
             </div>
           </article>
@@ -350,29 +565,157 @@
       }).join('');
 
       const skillGrid = document.getElementById('view-skills-grid');
-      skillGrid.innerHTML = db.skills.map(s => `
-        <div class="skill-item"><i data-lucide="${s.icon}" size="18"></i> ${s.name}</div>
-      `).join('');
+      skillGrid.innerHTML = db.skills.map(s => {
+        const iconHTML = s.customIcon 
+          ? `<img src="${s.customIcon}" alt="${s.name}">` 
+          : `<i data-lucide="${s.icon || 'code'}" size="18"></i>`;
+        return `<div class="skill-item">${iconHTML} ${s.name}</div>`;
+      }).join('');
 
       document.getElementById('view-contact-email').textContent = db.contact.email;
+      
+      const cvContainer = document.getElementById('view-cv-container');
+      if (db.contact.cvFile) {
+        cvContainer.innerHTML = `<a href="${db.contact.cvFile}" download="${db.contact.cvName || 'CV-Gavrill'}" class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;"><i data-lucide="file-text" size="14"></i> Unduh CV Saya</a>`;
+      } else {
+        cvContainer.innerHTML = '';
+      }
+
       document.getElementById('view-contact-socials').innerHTML = `
         <a href="${db.contact.github}" target="_blank"><i data-lucide="github" size="18"></i></a>
         <a href="${db.contact.linkedin}" target="_blank"><i data-lucide="linkedin" size="18"></i></a>
         <a href="${db.contact.twitter}" target="_blank"><i data-lucide="twitter" size="18"></i></a>
       `;
 
+      handleSearchAndFilter();
+      updateAdminFeedbackCount();
       lucide.createIcons();
     }
 
-    function filterProjects(category, btn) {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('#view-projects-grid .project-card').forEach(card => {
-        card.style.display = (category === 'all' || card.dataset.category === category) ? 'flex' : 'none';
-      });
+    /* SUBMIT FEEDBACK DARI PUBLIK */
+    function submitFeedback(e) {
+      e.preventDefault();
+      const name = document.getElementById('fbName').value;
+      const email = document.getElementById('fbEmail').value;
+      const subject = document.getElementById('fbSubject').value;
+      const message = document.getElementById('fbMessage').value;
+
+      const newFeedback = {
+        id: Date.now().toString(),
+        name,
+        email,
+        subject,
+        message,
+        date: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
+      };
+
+      db.feedbacks.unshift(newFeedback);
+      setDB(db);
+
+      alert('Terima kasih! Pesan/Feedback Anda berhasil terkirim ke Admin.');
+      document.getElementById('publicFeedbackForm').reset();
     }
 
-    // MODAL & AUTENTIKASI
+    /* RENDER ADMIN FEEDBACKS */
+    function renderAdminFeedbacks() {
+      const container = document.getElementById('adminFeedbacksList');
+      updateAdminFeedbackCount();
+
+      if (!db.feedbacks || db.feedbacks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i data-lucide="inbox" size="32" style="margin-bottom:8px; opacity:0.6;"></i>
+            <p>Belum ada pesan atau feedback masuk.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = db.feedbacks.map(fb => `
+        <div class="card-box admin-card-feedback">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+            <div>
+              <h3 style="font-size:1.05rem; font-weight:700;">${fb.subject}</h3>
+              <p style="font-size:0.85rem; color:var(--text-muted);">
+                Dari: <strong>${fb.name}</strong> (${fb.email}) &bull; <span style="font-size:0.8rem;">${fb.date}</span>
+              </p>
+            </div>
+            <button class="btn btn-danger" style="padding:6px 12px; font-size:0.8rem;" onclick="deleteFeedback('${fb.id}')">
+              <i data-lucide="trash-2" size="14"></i> Hapus
+            </button>
+          </div>
+          <div style="background:#f8fafc; padding:14px; border-radius:8px; border:1px solid var(--border-color); font-size:0.9rem; line-height:1.6; white-space:pre-line;">
+            ${fb.message}
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function deleteFeedback(id) {
+      if (confirm('Hapus pesan feedback ini?')) {
+        db.feedbacks = db.feedbacks.filter(f => f.id !== id);
+        setDB(db);
+        renderAdminFeedbacks();
+      }
+    }
+
+    function clearAllFeedbacks() {
+      if (db.feedbacks.length === 0) return;
+      if (confirm('Yakin ingin menghapus seluruh pesan masuk?')) {
+        db.feedbacks = [];
+        setDB(db);
+        renderAdminFeedbacks();
+      }
+    }
+
+    function updateAdminFeedbackCount() {
+      const fbCount = document.getElementById('admin-fb-count');
+      if (fbCount) {
+        fbCount.textContent = db.feedbacks ? db.feedbacks.length : 0;
+      }
+    }
+
+    /* SEARCH & FILTER PUBLIC */
+    function filterProjects(category, btn) {
+      if (btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      currentCategory = category;
+      handleSearchAndFilter();
+    }
+
+    function handleSearchAndFilter() {
+      const query = (document.getElementById('projectSearchInput')?.value || '').toLowerCase().trim();
+      const cards = document.querySelectorAll('#view-projects-grid .project-card');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const catMatch = currentCategory === 'all' || card.dataset.category === currentCategory;
+        const title = (card.dataset.title || '').toLowerCase();
+        const desc = (card.dataset.desc || '').toLowerCase();
+        const tags = (card.dataset.tags || '').toLowerCase();
+        const searchMatch = !query || title.includes(query) || desc.includes(query) || tags.includes(query);
+
+        if (catMatch && searchMatch) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      const emptyState = document.getElementById('no-projects');
+      if (emptyState) {
+        if (visibleCount === 0) emptyState.classList.remove('hidden');
+        else emptyState.classList.add('hidden');
+      }
+    }
+
+    /* AUTH & ADMIN MODAL */
     function showLoginModal() { document.getElementById('login-modal').classList.remove('hidden'); }
     function hideLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
 
@@ -397,58 +740,197 @@
       document.getElementById('public-view').classList.remove('hidden');
     }
 
-    // LOGIKA DASHBOARD ADMIN
     function populateAdminFields() {
       document.getElementById('editHeroStatus').value = db.hero.status;
       document.getElementById('editHeroTitle').value = db.hero.title;
       document.getElementById('editHeroSubtitle').value = db.hero.subtitle;
-      document.getElementById('editHeroImage').value = db.hero.image || "";
+      document.getElementById('editHeroImage').value = db.hero.image || "download.jpg";
 
       document.getElementById('editContactEmail').value = db.contact.email;
       document.getElementById('editContactGithub').value = db.contact.github;
       document.getElementById('editContactLinkedin').value = db.contact.linkedin;
       document.getElementById('editContactTwitter').value = db.contact.twitter;
 
+      const cvStatus = document.getElementById('cvFileStatus');
+      cvStatus.textContent = db.contact.cvName ? `File tersimpan: ${db.contact.cvName}` : "Belum ada file CV diunggah.";
+
       document.getElementById('editAdminUser').value = db.auth.username;
       document.getElementById('editAdminPass').value = db.auth.password;
 
       renderAdminProjects();
       renderAdminSkills();
+      renderAdminFeedbacks();
     }
 
+    function handleHeroImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('editHeroImage').value = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    /* ADMIN PROJECTS */
     function renderAdminProjects() {
-      document.getElementById('editProjectsList').innerHTML = db.projects.map((p, i) => `
-        <div class="card-box">
-          <div class="form-group"><label>Judul</label><input type="text" value="${p.title}" class="input-field" onchange="db.projects[${i}].title=this.value"></div>
-          <div class="form-group"><label>Kategori (web/design/mobile)</label><input type="text" value="${p.category}" class="input-field" onchange="db.projects[${i}].category=this.value"></div>
-          <div class="form-group"><label>Deskripsi</label><textarea class="input-field" onchange="db.projects[${i}].desc=this.value">${p.desc}</textarea></div>
-          <div class="form-group"><label>Tags (Gunakan 'Upcoming' untuk badge khusus)</label><input type="text" value="${p.tags}" class="input-field" onchange="db.projects[${i}].tags=this.value"></div>
-          <div class="form-group"><label>URL Gambar</label><input type="text" value="${p.image}" class="input-field" onchange="db.projects[${i}].image=this.value"></div>
-          <button class="btn btn-danger" onclick="db.projects.splice(${i},1); renderAdminProjects();">Hapus Project</button>
+      const query = (document.getElementById('adminProjectSearchInput')?.value || '').toLowerCase().trim();
+      const listContainer = document.getElementById('editProjectsList');
+
+      const filtered = db.projects.filter(p => {
+        const title = (p.title || '').toLowerCase();
+        const desc = (p.desc || '').toLowerCase();
+        const tags = (p.tags || '').toLowerCase();
+        return !query || title.includes(query) || desc.includes(query) || tags.includes(query);
+      });
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div class="empty-state">
+            <i data-lucide="search-x" size="28" style="margin-bottom:8px; opacity:0.6;"></i>
+            <p>Tidak ada project yang cocok dengan pencarian admin.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      listContainer.innerHTML = filtered.map(p => `
+        <div class="card-box admin-card-project">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-color); padding-bottom:12px;">
+            <span style="font-size:0.85rem; font-weight:700; color:var(--accent);">PROJECT ID: #${p.id}</span>
+            <button class="btn btn-danger" style="padding:6px 12px; font-size:0.8rem;" onclick="deleteProject('${p.id}')">
+              <i data-lucide="trash-2" size="14"></i> Hapus Project
+            </button>
+          </div>
+
+          <div class="admin-grid-2">
+            <div class="form-group">
+              <label>Judul Project</label>
+              <input type="text" value="${p.title}" class="input-field" onchange="updateProjectField('${p.id}', 'title', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Kategori (web / design / mobile)</label>
+              <input type="text" value="${p.category}" class="input-field" onchange="updateProjectField('${p.id}', 'category', this.value)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Deskripsi Project</label>
+            <textarea class="input-field" onchange="updateProjectField('${p.id}', 'desc', this.value)">${p.desc}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Tags</label>
+            <input type="text" value="${p.tags}" class="input-field" onchange="updateProjectField('${p.id}', 'tags', this.value)">
+          </div>
+
+          <div class="admin-grid-2">
+            <div class="form-group">
+              <label>Upload Gambar dari Folder</label>
+              <input type="file" accept="image/*" class="input-field" onchange="handleProjectImageUpload(event, '${p.id}')">
+            </div>
+            <div class="form-group">
+              <label>Atau URL / File Path Gambar</label>
+              <input type="text" value="${p.image}" class="input-field" onchange="updateProjectField('${p.id}', 'image', this.value)">
+            </div>
+          </div>
         </div>
       `).join('');
+
+      lucide.createIcons();
     }
 
-    function renderAdminSkills() {
-      document.getElementById('editSkillsList').innerHTML = db.skills.map((s, i) => `
-        <div class="card-box" style="display:flex; gap:12px; align-items:center;">
-          <input type="text" value="${s.name}" class="input-field" placeholder="Nama Skill" onchange="db.skills[${i}].name=this.value">
-          <input type="text" value="${s.icon}" class="input-field" placeholder="Nama Ikon Lucide" onchange="db.skills[${i}].icon=this.value">
-          <button class="btn btn-danger" onclick="db.skills.splice(${i},1); renderAdminSkills();">Hapus</button>
-        </div>
-      `).join('');
+    function updateProjectField(id, field, value) {
+      const proj = db.projects.find(p => p.id === id);
+      if (proj) proj[field] = value;
+    }
+
+    function handleProjectImageUpload(event, id) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          updateProjectField(id, 'image', e.target.result);
+          renderAdminProjects();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function deleteProject(id) {
+      if (confirm('Yakin ingin menghapus project ini?')) {
+        db.projects = db.projects.filter(p => p.id !== id);
+        renderAdminProjects();
+      }
     }
 
     function addProject() {
-      db.projects.unshift({ id: Date.now().toString(), category: "web", title: "Project Baru", desc: "", tags: "Upcoming", image: "", demoUrl: "#", codeUrl: "#" });
+      const newProj = {
+        id: Date.now().toString(),
+        category: "web",
+        title: "Project Baru",
+        desc: "Deskripsi singkat project...",
+        tags: "Upcoming",
+        image: "download.jpg",
+        demoUrl: "#",
+        codeUrl: "#"
+      };
+      db.projects.unshift(newProj);
+      document.getElementById('adminProjectSearchInput').value = '';
       renderAdminProjects();
     }
 
+    /* ADMIN SKILLS */
+    function renderAdminSkills() {
+      document.getElementById('editSkillsList').innerHTML = db.skills.map((s, i) => `
+        <div class="card-box" style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <input type="text" value="${s.name}" class="input-field" placeholder="Nama Skill" onchange="db.skills[${i}].name=this.value">
+            <input type="text" value="${s.icon || ''}" class="input-field" placeholder="Nama Ikon Lucide" onchange="db.skills[${i}].icon=this.value">
+            <button class="btn btn-danger" onclick="db.skills.splice(${i},1); renderAdminSkills();"><i data-lucide="trash-2" size="14"></i></button>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:0.75rem; color:var(--text-muted);">Atau Upload Logo Kustom dari Folder:</label>
+            <input type="file" accept="image/*" class="input-field" onchange="handleSkillIconUpload(event, ${i})">
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function handleSkillIconUpload(event, index) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          db.skills[index].customIcon = e.target.result;
+          renderAdminSkills();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
     function addSkill() {
-      db.skills.push({ id: Date.now().toString(), name: "Skill Baru", icon: "code" });
+      db.skills.push({ id: Date.now().toString(), name: "Skill Baru", icon: "code", customIcon: "" });
       renderAdminSkills();
     }
 
+    function handleContactCVUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          db.contact.cvFile = e.target.result;
+          db.contact.cvName = file.name;
+          document.getElementById('cvFileStatus').textContent = `File dipilih: ${file.name}`;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    /* SAVE & UTILITIES */
     function saveData() {
       db.hero.status = document.getElementById('editHeroStatus').value;
       db.hero.title = document.getElementById('editHeroTitle').value;
@@ -471,14 +953,46 @@
       alert('Kredensial Admin berhasil diperbarui!');
     }
 
+    function exportBackup() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "gavrill_portfolio_backup.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function handleRestoreData(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const restoredData = JSON.parse(e.target.result);
+            db = restoredData;
+            setDB(db);
+            alert('Data portofolio berhasil dipulihkan!');
+            location.reload();
+          } catch(err) {
+            alert('File backup JSON tidak valid!');
+          }
+        };
+        reader.readAsText(file);
+      }
+    }
+
     function switchTab(tab, btn) {
       document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
       document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(`tab-${tab}`).classList.remove('hidden');
       btn.classList.add('active');
+
+      if (tab === 'feedbacks') {
+        renderAdminFeedbacks();
+      }
     }
 
-    // INIT
     document.addEventListener('DOMContentLoaded', renderPublicView);
   </script>
 </body>
