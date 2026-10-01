@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reaction Time Challenge - Uji Ketangkasan Refleks</title>
+    <!-- Tailwind CSS CDN for modern responsive utility styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.7); }
+        }
+
+        .shake-animation {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .pop-in {
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Target circle ripple effect */
+        .target-node {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .target-node:active {
+            transform: scale(0.9);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-cyan-500 selection:text-black">
+
+    <!-- Header Area -->
+    <header class="w-full max-w-4xl mx-auto px-4 py-4 flex items-center justify-between border-b border-slate-800/80">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">Reflex Master</h1>
+                <p class="text-xs text-slate-400 font-medium">Uji Ketangkasan & Waktu Reaksi</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <!-- Audio Toggle Button -->
+            <button id="audioToggleBtn" onclick="toggleAudio()" class="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-all" title="Aktifkan/Matikan Suara">
+                <svg id="audioIconOn" class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z"/>
+                </svg>
+                <svg id="audioIconOff" class="w-5 h-5 text-slate-500 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+                </svg>
+            </button>
+
+            <!-- Instructions Modal Toggle Button -->
+            <button onclick="openInstructions()" class="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-all flex items-center gap-1.5 text-xs font-semibold">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="hidden sm:inline">Instruksi</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-4xl mx-auto px-4 py-6 flex-grow flex flex-col justify-center items-center">
+        
+        <!-- Game Mode Tabs -->
+        <div class="flex p-1 bg-slate-900 border border-slate-800 rounded-2xl mb-6 w-full max-w-md">
+            <button id="tabVisual" onclick="switchMode('visual')" class="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 bg-cyan-500 text-slate-950 shadow-md">
+                ⚡ Layar Kilat
+            </button>
+            <button id="tabTarget" onclick="switchMode('target')" class="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-white">
+                🎯 Pemburu Target
+            </button>
+        </div>
+
+        <!-- High Score Dashboard Bar -->
+        <div class="w-full grid grid-cols-2 gap-3 mb-6">
+            <div class="glass-panel p-3.5 rounded-2xl flex flex-col items-center justify-center text-center">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Rekor Tercepat (Visual)</span>
+                <div class="flex items-baseline gap-1">
+                    <span id="visualHighScore" class="text-2xl sm:text-3xl font-extrabold text-cyan-400">--</span>
+                    <span class="text-xs text-slate-500 font-bold">ms</span>
+                </div>
+            </div>
+            <div class="glass-panel p-3.5 rounded-2xl flex flex-col items-center justify-center text-center">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Rekor Waktu (10 Target)</span>
+                <div class="flex items-baseline gap-1">
+                    <span id="targetHighScore" class="text-2xl sm:text-3xl font-extrabold text-emerald-400">--</span>
+                    <span class="text-xs text-slate-500 font-bold">ms</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Game Arena -->
+        <div class="w-full relative">
+            
+            <!-- MODE 1: VISUAL REACTION ARENA -->
+            <div id="visualModeArena" onclick="handleVisualAreaClick()" class="w-full h-[360px] sm:h-[420px] rounded-3xl cursor-pointer transition-all duration-300 flex flex-col items-center justify-center text-center p-6 bg-slate-900 border-2 border-slate-800 hover:border-slate-700 shadow-2xl relative overflow-hidden select-none">
+                
+                <!-- Background Glow Graphic -->
+                <div id="arenaGlow" class="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-transparent opacity-50 pointer-events-none"></div>
+
+                <!-- Arena Icon Display -->
+                <div id="visualIcon" class="w-20 h-20 rounded-full bg-slate-800/80 flex items-center justify-center mb-6 border border-slate-700 shadow-inner transition-transform duration-300">
+                    <svg class="w-10 h-10 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+
+                <!-- Dynamic Status Texts -->
+                <h2 id="visualMainMessage" class="text-2xl sm:text-4xl font-extrabold text-white mb-2 tracking-tight">Tekan Untuk Memulai</h2>
+                <p id="visualSubMessage" class="text-sm sm:text-base text-slate-400 max-w-md font-medium">Klik di mana saja atau tekan <kbd class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-xs text-slate-200">Spacebar</kbd> saat warna berubah menjadi HIJAU.</p>
+                
+                <!-- Round indicator -->
+                <div id="roundBadge" class="hidden absolute top-4 left-4 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs font-bold text-slate-300">
+                    Ronde: <span id="currentRoundText" class="text-cyan-400">1</span> / 5
+                </div>
+
+                <!-- Live ms Display result -->
+                <div id="msDisplay" class="hidden my-2">
+                    <span id="msNumber" class="text-5xl sm:text-6xl font-black text-white tracking-tight">214</span>
+                    <span class="text-xl font-bold text-slate-400"> ms</span>
+                </div>
+
+                <!-- Rating Grade Badge -->
+                <div id="ratingBadge" class="hidden mt-3 px-4 py-1.5 rounded-full text-xs sm:text-sm font-extrabold uppercase tracking-wide">
+                    -
+                </div>
+            </div>
+
+            <!-- MODE 2: TARGET SPEED ARENA -->
+            <div id="targetModeArena" class="hidden w-full h-[360px] sm:h-[420px] rounded-3xl bg-slate-900 border-2 border-slate-800 shadow-2xl relative overflow-hidden select-none flex flex-col items-center justify-center">
+                
+                <!-- Start Overlay for Target Mode -->
+                <div id="targetStartOverlay" class="absolute inset-0 z-20 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center text-center p-6">
+                    <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4 border border-emerald-500/30">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Uji Kecepatan Pemburu Target</h2>
+                    <p class="text-sm text-slate-400 max-w-md mb-6 font-medium">Klik 10 lingkaran target merah yang akan muncul secara acak secepat mungkin!</p>
+                    <button onclick="startTargetGame()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95">
+                        Mulai Pemburu Target
+                    </button>
+                </div>
+
+                <!-- HUD Info Bar -->
+                <div class="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none z-10">
+                    <div class="px-3.5 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-bold text-slate-300">
+                        Target Tersisa: <span id="targetCounter" class="text-emerald-400 text-sm">10</span>
+                    </div>
+                    <div class="px-3.5 py-1.5 rounded-xl bg-slate-950/80 border border-slate-800 text-xs font-bold text-slate-300">
+                        Waktu: <span id="targetTimer" class="text-cyan-400 text-sm">0.000</span> s
+                    </div>
+                </div>
+
+                <!-- Dynamic Target Spawner Box -->
+                <div id="targetPlayArea" class="w-full h-full relative overflow-hidden">
+                    <!-- Target node generated dynamically here -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Action Buttons & Controls -->
+        <div class="w-full flex flex-wrap items-center justify-between gap-3 mt-6">
+            <button id="resetGameBtn" onclick="resetCurrentGame()" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2">
+                <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Mulai Ulang (Restart)
+            </button>
+
+            <button onclick="clearHighScores()" class="px-4 py-2.5 rounded-xl bg-slate-900/60 hover:bg-red-950/40 border border-slate-800 hover:border-red-900/50 text-slate-400 hover:text-red-400 text-xs font-semibold transition-all">
+                Hapus Rekor
+            </button>
+        </div>
+
+        <!-- Session Attempts History Card -->
+        <div class="w-full glass-panel rounded-2xl p-4 mt-6">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                <span>Riwayat Percobaan Ronde Ini</span>
+                <span id="avgText" class="text-cyan-400 font-extrabold normal-case">Rata-rata: -- ms</span>
+            </h3>
+            
+            <div id="attemptsList" class="flex items-center gap-2 overflow-x-auto pb-1 min-h-[42px]">
+                <span class="text-xs text-slate-600 italic">Belum ada percobaan. Tekan area game untuk memulai.</span>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Instructions & Rules Modal -->
+    <div id="instructionsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 border border-slate-700 shadow-2xl relative pop-in">
+            <button onclick="closeInstructions()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <h3 class="text-xl font-extrabold text-white mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Aturan & Cara Bermain
+            </h3>
+
+            <div class="space-y-4 text-sm text-slate-300">
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                    <h4 class="font-bold text-cyan-400 mb-1">1. Mode Layar Kilat (Visual Reflex)</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        • Klik/Sentuh layar begitu warnanya berubah menjadi <strong class="text-emerald-400">HIJAU</strong>.<br>
+                        • <strong>Kondisi Kalah / False Start:</strong> Jika mengeklik saat layar masih MERAH, ronde dibatalkan.<br>
+                        • Permainan berlangsung selama 5 ronde untuk menghitung waktu reaksi rata-rata.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                    <h4 class="font-bold text-emerald-400 mb-1">2. Mode Pemburu Target (Aim Reflex)</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        • Tangkap 10 target merah yang muncul berurutan di dalam arena.<br>
+                        • Pengukur waktu mengukur total milidetik yang Anda butuhkan untuk menyelesaikan 10 target.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                    <h4 class="font-bold text-amber-400 mb-2">Tingkat Ketangkasan Refleks:</h4>
+                    <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+                        <div class="text-cyan-400">&lt; 180 ms : Dewa Refleks ⚡</div>
+                        <div class="text-emerald-400">180 - 240 ms : Kilat Pro 🚀</div>
+                        <div class="text-blue-400">240 - 300 ms : Bagus & Tangkas 👍</div>
+                        <div class="text-slate-400">&gt; 300 ms : Normal / Butuh Kopi ☕</div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeInstructions()" class="w-full mt-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-sm transition-all shadow-lg shadow-cyan-500/20">
+                Paham, Mulai Bermain!
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-4xl mx-auto px-4 py-4 text-center text-xs text-slate-500 border-t border-slate-800/80 mt-6">
+        Reflex Master Web Game &bull; Disimpan secara lokal di Browser Anda.
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           GAME STATE & VARIABLES
+           ========================================================================== */
+        let currentMode = 'visual'; // 'visual' | 'target'
+        
+        // Visual Mode State Variables
+        let visualState = 'IDLE'; // 'IDLE' | 'WAITING' | 'READY' | 'RESULT' | 'FALSE_START'
+        let visualStartTime = 0;
+        let visualTimeoutId = null;
+        let visualRounds = [];
+        const MAX_ROUNDS = 5;
+
+        // Target Mode State Variables
+        let targetCount = 10;
+        let targetsRemaining = 10;
+        let targetStartTime = 0;
+        let targetTimerInterval = null;
+        let isTargetGameActive = false;
+        let targetHistory = [];
+
+        // Sound Engine Variables
+        let isAudioMuted = false;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtxClass) {
+                    audioCtx = new AudioCtxClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const iconOn = document.getElementById('audioIconOn');
+            const iconOff = document.getElementById('audioIconOff');
+            if (isAudioMuted) {
+                iconOn.classList.add('hidden');
+                iconOff.classList.remove('hidden');
+            } else {
+                iconOn.classList.remove('hidden');
+                iconOff.classList.add('hidden');
+            }
+        }
+
+        function playSound(type) {
+            if (isAudioMuted) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'start') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'go') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(880, now);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'success' || type === 'highscore') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                }
+            } catch (e) {
+                console.error("Audio playback error:", e);
+            }
+        }
+
+        const memoryStore = {};
+
+        function getStorageItem(key) {
+            try {
+                return localStorage.getItem(key);
+            } catch (e) {
+                return memoryStore[key] || null;
+            }
+        }
+
+        function setStorageItem(key, value) {
+            try {
+                localStorage.setItem(key, value);
+            } catch (e) {
+                memoryStore[key] = value;
+            }
+        }
+
+        function removeStorageItem(key) {
+            try {
+                localStorage.removeItem(key);
+            } catch (e) {
+                delete memoryStore[key];
+            }
+        }
+
+        /* ==========================================================================
+           LOCALSTORAGE & HIGH SCORES
+           ========================================================================== */
+        function loadHighScores() {
+            const visualBest = getStorageItem('reflex_visual_highscore');
+            const targetBest = getStorageItem('reflex_target_highscore');
+
+            document.getElementById('visualHighScore').innerText = visualBest ? visualBest : '--';
+            document.getElementById('targetHighScore').innerText = targetBest ? targetBest : '--';
+        }
+
+        function saveVisualHighScore(score) {
+            const currentBest = getStorageItem('reflex_visual_highscore');
+            if (!currentBest || score < parseInt(currentBest)) {
+                setStorageItem('reflex_visual_highscore', score);
+                document.getElementById('visualHighScore').innerText = score;
+                playSound('highscore');
+                return true;
+            }
+            return false;
+        }
+
+        function saveTargetHighScore(score) {
+            const currentBest = getStorageItem('reflex_target_highscore');
+            if (!currentBest || score < parseInt(currentBest)) {
+                setStorageItem('reflex_target_highscore', score);
+                document.getElementById('targetHighScore').innerText = score;
+                playSound('highscore');
+                return true;
+            }
+            return false;
+        }
+
+        function clearHighScores() {
+            if (confirm("Apakah Anda yakin ingin menghapus semua rekor tertinggi?")) {
+                removeStorageItem('reflex_visual_highscore');
+                removeStorageItem('reflex_target_highscore');
+                loadHighScores();
+            }
+        }
+
+        function switchMode(mode) {
+            if (currentMode === mode) return;
+            currentMode = mode;
+
+            resetCurrentGame();
+
+            const tabVisual = document.getElementById('tabVisual');
+            const tabTarget = document.getElementById('tabTarget');
+            const visualArena = document.getElementById('visualModeArena');
+            const targetArena = document.getElementById('targetModeArena');
+
+            if (mode === 'visual') {
+                tabVisual.className = "flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 bg-cyan-500 text-slate-950 shadow-md";
+                tabTarget.className = "flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-white";
+                visualArena.classList.remove('hidden');
+                targetArena.classList.add('hidden');
+            } else {
+                tabTarget.className = "flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 bg-emerald-500 text-slate-950 shadow-md";
+                tabVisual.className = "flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 text-slate-400 hover:text-white";
+                targetArena.classList.remove('hidden');
+                visualArena.classList.add('hidden');
+            }
+
+            updateAttemptsHistory();
+        }
+
+        function openInstructions() {
+            document.getElementById('instructionsModal').classList.remove('hidden');
+        }
+
+        function closeInstructions() {
+            document.getElementById('instructionsModal').classList.add('hidden');
+        }
+
+        /* ==========================================================================
+           MODE 1: VISUAL REACTION TEST ENGINE
+           ========================================================================== */
+        function handleVisualAreaClick() {
+            initAudio();
+
+            if (visualState === 'IDLE' || visualState === 'RESULT' || visualState === 'FALSE_START') {
+                startVisualRound();
+            } else if (visualState === 'WAITING') {
+                triggerFalseStart();
+            } else if (visualState === 'READY') {
+                const reactionTime = Math.round(performance.now() - visualStartTime);
+                finishVisualRound(reactionTime);
+            }
+        }
+
+        function startVisualRound() {
+            clearTimeout(visualTimeoutId);
+            visualState = 'WAITING';
+
+            const arena = document.getElementById('visualModeArena');
+            const mainMsg = document.getElementById('visualMainMessage');
+            const subMsg = document.getElementById('visualSubMessage');
+            const iconContainer = document.getElementById('visualIcon');
+            const msDisplay = document.getElementById('msDisplay');
+            const ratingBadge = document.getElementById('ratingBadge');
+            const roundBadge = document.getElementById('roundBadge');
+
+            arena.className = "w-full h-[360px] sm:h-[420px] rounded-3xl cursor-pointer transition-all duration-300 flex flex-col items-center justify-center text-center p-6 bg-rose-950/80 border-2 border-rose-600 shadow-2xl relative overflow-hidden select-none pulse-glow";
+            
+            iconContainer.className = "w-20 h-20 rounded-full bg-rose-900/60 flex items-center justify-center mb-6 border border-rose-500 shadow-inner";
+            iconContainer.innerHTML = `<svg class="w-10 h-10 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+
+            mainMsg.innerText = "SIAP-SIAP...";
+            subMsg.innerText = "Tunggu hingga layar berubah menjadi HIJAU. Jangan klik dulu!";
+            msDisplay.classList.add('hidden');
+            ratingBadge.classList.add('hidden');
+            roundBadge.classList.remove('hidden');
+            document.getElementById('currentRoundText').innerText = visualRounds.length + 1;
+
+            playSound('start');
+
+            const randomDelay = Math.floor(Math.random() * 3000) + 2000;
+            visualTimeoutId = setTimeout(() => {
+                triggerGreenReady();
+            }, randomDelay);
+        }
+
+        function triggerGreenReady() {
+            visualState = 'READY';
+            visualStartTime = performance.now();
+
+            const arena = document.getElementById('visualModeArena');
+            const mainMsg = document.getElementById('visualMainMessage');
+            const subMsg = document.getElementById('visualSubMessage');
+            const iconContainer = document.getElementById('visualIcon');
+
+            arena.className = "w-full h-[360px] sm:h-[420px] rounded-3xl cursor-pointer transition-all duration-150 flex flex-col items-center justify-center text-center p-6 bg-emerald-600 border-2 border-emerald-400 shadow-2xl relative overflow-hidden select-none scale-[1.01]";
+            
+            iconContainer.className = "w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center mb-6 border border-emerald-300 shadow-inner";
+            iconContainer.innerHTML = `<svg class="w-10 h-10 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>`;
+
+            mainMsg.innerText = "KLIK SEKARANG!";
+            subMsg.innerText = "Tekan secepat mungkin!";
+
+            playSound('go');
+        }
+
+        function triggerFalseStart() {
+            clearTimeout(visualTimeoutId);
+            visualState = 'FALSE_START';
+
+            const arena = document.getElementById('visualModeArena');
+            const mainMsg = document.getElementById('visualMainMessage');
+            const subMsg = document.getElementById('visualSubMessage');
+            const iconContainer = document.getElementById('visualIcon');
+
+            arena.className = "w-full h-[360px] sm:h-[420px] rounded-3xl cursor-pointer transition-all duration-200 flex flex-col items-center justify-center text-center p-6 bg-amber-950/90 border-2 border-amber-500 shadow-2xl relative overflow-hidden select-none shake-animation";
+            
+            iconContainer.className = "w-20 h-20 rounded-full bg-amber-900/60 flex items-center justify-center mb-6 border border-amber-500 shadow-inner";
+            iconContainer.innerHTML = `<svg class="w-10 h-10 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`;
+
+            mainMsg.innerText = "TERLALU CEPTA!";
+            subMsg.innerText = "Anda mengeklik sebelum warna HIJAU muncul. Klik untuk mencoba lagi.";
+
+            playSound('error');
+        }
+
+        function finishVisualRound(ms) {
+            visualState = 'RESULT';
+            visualRounds.push(ms);
+
+            const arena = document.getElementById('visualModeArena');
+            const mainMsg = document.getElementById('visualMainMessage');
+            const subMsg = document.getElementById('visualSubMessage');
+            const iconContainer = document.getElementById('visualIcon');
+            const msDisplay = document.getElementById('msDisplay');
+            const msNumber = document.getElementById('msNumber');
+            const ratingBadge = document.getElementById('ratingBadge');
+
+            arena.className = "w-full h-[360px] sm:h-[420px] rounded-3xl cursor-pointer transition-all duration-300 flex flex-col items-center justify-center text-center p-6 bg-slate-900 border-2 border-slate-700 hover:border-cyan-500 shadow-2xl relative overflow-hidden select-none";
+
+            iconContainer.className = "w-16 h-16 rounded-full bg-cyan-950/80 flex items-center justify-center mb-4 border border-cyan-500/50 shadow-inner";
+            iconContainer.innerHTML = `<svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+
+            msNumber.innerText = ms;
+            msDisplay.classList.remove('hidden');
+
+            const rating = getRating(ms);
+            ratingBadge.innerText = rating.label;
+            ratingBadge.className = `mt-3 px-4 py-1.5 rounded-full text-xs sm:text-sm font-extrabold uppercase tracking-wide border pop-in ${rating.bgClass}`;
+            ratingBadge.classList.remove('hidden');
+
+            const isSingleRecord = saveVisualHighScore(ms);
+
+            updateAttemptsHistory();
+
+            if (visualRounds.length >= MAX_ROUNDS) {
+                const avg = Math.round(visualRounds.reduce((a, b) => a + b, 0) / visualRounds.length);
+
+                mainMsg.innerText = "SESI SELESAI!";
+                subMsg.innerText = `Rata-rata 5 ronde Anda adalah ${avg} ms. Klik untuk ulangi sesi baru.`;
+
+                playSound('success');
+            } else {
+                mainMsg.innerText = "BAGUS!";
+                subMsg.innerText = isSingleRecord 
+                    ? `🎉 REKOR KILAT BARU! (${ms} ms). Klik di mana saja untuk ronde berikutnya.`
+                    : `Ronde ${visualRounds.length} selesai. Klik di mana saja untuk lanjut ke ronde berikutnya.`;
+                if (!isSingleRecord) playSound('success');
+            }
+        }
+
+        function getRating(ms) {
+            if (ms < 180) {
+                return { label: "Refleks Dewa ⚡", bgClass: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40" };
+            } else if (ms <= 240) {
+                return { label: "Kilat Pro 🚀", bgClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40" };
+            } else if (ms <= 300) {
+                return { label: "Sangat Bagus 👍", bgClass: "bg-blue-500/20 text-blue-300 border-blue-500/40" };
+            } else if (ms <= 380) {
+                return { label: "Rata-Rata Normal ⏱️", bgClass: "bg-amber-500/20 text-amber-300 border-amber-500/40" };
+            } else {
+                return { label: "Lambat / Perlu Kopi ☕", bgClass: "bg-rose-500/20 text-rose-300 border-rose-500/40" };
+            }
+        }
+
+        /* ==========================================================================
+           MODE 2: TARGET HUNTER ENGINE
+           ========================================================================== */
+        function startTargetGame() {
+            initAudio();
+            document.getElementById('targetStartOverlay').classList.add('hidden');
+            
+            targetsRemaining = targetCount;
+            document.getElementById('targetCounter').innerText = targetsRemaining;
+            
+            isTargetGameActive = true;
+            targetStartTime = performance.now();
+
+            clearInterval(targetTimerInterval);
+            targetTimerInterval = setInterval(() => {
+                if (!isTargetGameActive) return;
+                const elapsed = (performance.now() - targetStartTime) / 1000;
+                document.getElementById('targetTimer').innerText = elapsed.toFixed(3);
+            }, 30);
+
+            spawnTargetNode();
+            playSound('start');
+        }
+
+        function spawnTargetNode() {
+            const playArea = document.getElementById('targetPlayArea');
+            playArea.innerHTML = '';
+
+            if (targetsRemaining <= 0) {
+                finishTargetGame();
+                return;
+            }
+
+            const target = document.createElement('button');
+            target.className = "target-node absolute w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-rose-500 to-emerald-400 p-1 shadow-lg shadow-emerald-500/30 flex items-center justify-center cursor-pointer pop-in focus:outline-none";
+            
+            const maxX = playArea.clientWidth - 70;
+            const maxY = playArea.clientHeight - 70;
+
+            const randomX = Math.max(10, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(40, Math.floor(Math.random() * maxY));
+
+            target.style.left = `${randomX}px`;
+            target.style.top = `${randomY}px`;
+
+            target.innerHTML = `<div class="w-full h-full rounded-full bg-slate-950 flex items-center justify-center">
+                <div class="w-4 h-4 rounded-full bg-emerald-400"></div>
+            </div>`;
+
+            target.onclick = (e) => {
+                e.stopPropagation();
+                targetsRemaining--;
+                document.getElementById('targetCounter').innerText = targetsRemaining;
+                playSound('go');
+                spawnTargetNode();
+            };
+
+            playArea.appendChild(target);
+        }
+
+        function finishTargetGame() {
+            isTargetGameActive = false;
+            clearInterval(targetTimerInterval);
+
+            const totalTimeMs = Math.round(performance.now() - targetStartTime);
+            const totalSec = (totalTimeMs / 1000).toFixed(3);
+            
+            targetHistory.push(totalTimeMs);
+            updateAttemptsHistory();
+
+            const playArea = document.getElementById('targetPlayArea');
+            playArea.innerHTML = '';
+
+            const isNewRecord = saveTargetHighScore(totalTimeMs);
+
+            const overlay = document.getElementById('targetStartOverlay');
+            overlay.innerHTML = `
+                <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-3 border border-emerald-500/30">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <h2 class="text-3xl font-extrabold text-white mb-1">${totalSec} Detik</h2>
+                <p class="text-sm text-emerald-400 font-bold mb-4">${isNewRecord ? '🎉 REKOR BARU TERCAPAI!' : 'Tugas Selesai!'}</p>
+                <p class="text-xs text-slate-400 max-w-xs mb-6">Rata-rata kecepatan ketuk: ${Math.round(totalTimeMs / 10)} ms / target.</p>
+                <button onclick="startTargetGame()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition-all hover:scale-105">
+                    Coba Lagi
+                </button>
+            `;
+            overlay.classList.remove('hidden');
+            playSound('success');
+        }
+
+        /* ==========================================================================
+           HISTORICAL STATS & GENERAL RESET
+           ========================================================================== */
+        function updateAttemptsHistory() {
+            const list = document.getElementById('attemptsList');
+            const avgText = document.getElementById('avgText');
+
+            const currentArray = currentMode === 'visual' ? visualRounds : targetHistory;
+
+            if (currentArray.length === 0) {
+                list.innerHTML = `<span class="text-xs text-slate-600 italic">Belum ada percobaan. Tekan area game untuk memulai.</span>`;
+                avgText.innerText = "Rata-rata: -- ms";
+                return;
+            }
+
+            list.innerHTML = '';
+            currentArray.forEach((round, index) => {
+                const item = document.createElement('div');
+                item.className = "flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center gap-1.5 text-xs font-bold pop-in";
+                if (currentMode === 'visual') {
+                    item.innerHTML = `<span class="text-slate-500">#${index + 1}</span> <span class="text-cyan-400">${round}</span><span class="text-[10px] text-slate-500">ms</span>`;
+                } else {
+                    item.innerHTML = `<span class="text-slate-500">#${index + 1}</span> <span class="text-emerald-400">${(round / 1000).toFixed(2)}</span><span class="text-[10px] text-slate-500">s</span>`;
+                }
+                list.appendChild(item);
+            });
+
+            const avg = Math.round(currentArray.reduce((a, b) => a + b, 0) / currentArray.length);
+            avgText.innerText = currentMode === 'visual' ? `Rata-rata: ${avg} ms` : `Rata-rata: ${(avg / 1000).toFixed(2)} s`;
+        }
+
+        function resetCurrentGame() {
+            if (currentMode === 'visual') {
+                clearTimeout(visualTimeoutId);
+                visualState = 'IDLE';
+                visualRounds = [];
+
+                const arena = document.getElementById('visualModeArena');
+                const mainMsg = document.getElementById('visualMainMessage');
+                const subMsg = document.getElementById('visualSubMessage');
+                const iconContainer = document.getElementById('visualIcon');
+                const msDisplay = document.getElementById('msDisplay');
+                const ratingBadge = document.getElementById('ratingBadge');
+                const roundBadge = document.getElementById('roundBadge');
+
+                arena.className = "w-full h-[360px] sm:h-[420px] rounded-3xl cursor-pointer transition-all duration-300 flex flex-col items-center justify-center text-center p-6 bg-slate-900 border-2 border-slate-800 hover:border-slate-700 shadow-2xl relative overflow-hidden select-none";
+                
+                iconContainer.className = "w-20 h-20 rounded-full bg-slate-800/80 flex items-center justify-center mb-6 border border-slate-700 shadow-inner";
+                iconContainer.innerHTML = `<svg class="w-10 h-10 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+
+                mainMsg.innerText = "Tekan Untuk Memulai";
+                subMsg.innerText = "Klik di mana saja atau tekan Spacebar saat warna berubah menjadi HIJAU.";
+                msDisplay.classList.add('hidden');
+                ratingBadge.classList.add('hidden');
+                roundBadge.classList.add('hidden');
+            } else {
+                clearInterval(targetTimerInterval);
+                isTargetGameActive = false;
+                targetHistory = [];
+                document.getElementById('targetPlayArea').innerHTML = '';
+                document.getElementById('targetTimer').innerText = '0.000';
+                document.getElementById('targetCounter').innerText = '10';
+
+                const targetOverlay = document.getElementById('targetStartOverlay');
+                targetOverlay.innerHTML = `
+                    <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4 border border-emerald-500/30">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white mb-2">Uji Kecepatan Pemburu Target</h2>
+                    <p class="text-sm text-slate-400 max-w-md mb-6 font-medium">Klik 10 lingkaran target merah yang akan muncul secara acak secepat mungkin!</p>
+                    <button onclick="startTargetGame()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95">
+                        Mulai Pemburu Target
+                    </button>
+                `;
+                targetOverlay.classList.remove('hidden');
+            }
+
+            updateAttemptsHistory();
+        }
+
+        /* ==========================================================================
+           KEYBOARD SHORTCUTS & INIT
+           ========================================================================== */
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (currentMode === 'visual') {
+                    handleVisualAreaClick();
+                }
+            }
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadHighScores);
+        } else {
+            loadHighScores();
+        }
+
+        window.onload = function() {
+            loadHighScores();
+        };
+    </script>
+</body>
+</html>
